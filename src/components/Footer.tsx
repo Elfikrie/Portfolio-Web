@@ -8,9 +8,9 @@ const Footer = () => {
           © {new Date().getFullYear()} Personal Portfolio. All rights reserved.
         </p>
         <div className="flex items-center gap-4 text-sm text-gray-400">
-          <a href="#" className="hover:text-salmon-400 transition-colors">Twitter</a>
-          <a href="#" className="hover:text-salmon-400 transition-colors">GitHub</a>
-          <a href="#" className="hover:text-salmon-400 transition-colors">LinkedIn</a>
+          <a target="blank" href="https://instagram.com/elfikrie__" className="hover:text-salmon-400 transition-colors">Instagram</a>
+          <a target="blank" href="https://github.com/Elfikrie" className="hover:text-salmon-400 transition-colors">GitHub</a>
+          <a target="blank" href="https://linkedin.com/in/elfikrie" className="hover:text-salmon-400 transition-colors">LinkedIn</a>
         </div>
       </div>
     </footer>
