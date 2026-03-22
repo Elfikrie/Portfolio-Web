@@ -2,6 +2,8 @@ import React from "react";
 import Link from "next/link";
 import db from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function NotesPage() {
   const [rows]: any = await db.query('SELECT * FROM notes ORDER BY id DESC');
 

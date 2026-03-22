@@ -5,6 +5,8 @@ import { Button } from "@/components/Button";
 import { DeleteButton } from "@/components/DeleteButton";
 import { deleteNote } from "@/app/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminNotesPage() {
   const [rows]: any = await db.query('SELECT * FROM notes ORDER BY id DESC');
 

@@ -2,6 +2,8 @@ import React from "react";
 import db from "@/lib/db";
 import { Button } from "@/components/Button";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectsPage() {
   const [rows]: any = await db.query('SELECT * FROM projects ORDER BY created_at DESC');
   

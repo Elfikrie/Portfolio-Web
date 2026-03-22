@@ -5,6 +5,8 @@ import { Button } from "@/components/Button";
 import { DeleteButton } from "@/components/DeleteButton";
 import { deleteProject } from "@/app/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminProjectsPage() {
   const [rows]: any = await db.query('SELECT * FROM projects ORDER BY created_at DESC');
 

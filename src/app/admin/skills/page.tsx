@@ -5,6 +5,8 @@ import { Button } from "@/components/Button";
 import { DeleteButton } from "@/components/DeleteButton";
 import { deleteSkill } from "@/app/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSkillsPage() {
   const [rows]: any = await db.query('SELECT * FROM skills ORDER BY type ASC, level DESC');
 

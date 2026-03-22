@@ -5,6 +5,8 @@ import { Button } from "@/components/Button";
 import { DeleteButton } from "@/components/DeleteButton";
 import { deleteExperience } from "@/app/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminExperiencePage() {
   const [rows]: any = await db.query('SELECT * FROM experiences ORDER BY id DESC');
 

@@ -1,6 +1,8 @@
 import React from "react";
 import db from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function ExperiencePage() {
   const [experiences]: any = await db.query('SELECT * FROM experiences ORDER BY id DESC');
   const [organizations]: any = await db.query('SELECT * FROM organizations ORDER BY id DESC');

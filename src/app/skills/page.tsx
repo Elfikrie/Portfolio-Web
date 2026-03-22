@@ -1,6 +1,8 @@
 import React from "react";
 import db from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 const SkillCard = ({ skill, delay }: { skill: any; delay: number }) => (
   <div data-aos="fade-up" data-aos-delay={delay} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-salmon-500/30 transition-all duration-300">
     <div className="flex justify-between items-center mb-4">

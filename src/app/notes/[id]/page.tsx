@@ -4,6 +4,8 @@ import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import CommentSection from "@/components/CommentSection";
 
+export const dynamic = "force-dynamic";
+
 export default async function NoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [rows]: any = await db.query('SELECT * FROM notes WHERE id = ?', [id]);

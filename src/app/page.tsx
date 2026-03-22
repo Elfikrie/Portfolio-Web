@@ -4,6 +4,8 @@ import { Button } from "@/components/Button";
 import { Typewriter } from "@/components/Typewriter";
 import { ProfileImage } from "@/components/ProfileImage";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [projectsRows]: any = await db.query('SELECT * FROM projects ORDER BY id DESC LIMIT 2');
   const [notesRows]: any = await db.query('SELECT * FROM notes ORDER BY id DESC LIMIT 2');
