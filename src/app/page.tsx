@@ -7,12 +7,35 @@ import { ProfileImage } from "@/components/ProfileImage";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [projectsRows]: any = await db.query('SELECT * FROM projects ORDER BY id DESC LIMIT 2');
-  const [notesRows]: any = await db.query('SELECT * FROM notes ORDER BY id DESC LIMIT 2');
-  const [hardSkillsRows]: any = await db.query('SELECT * FROM skills WHERE type="hard" LIMIT 4');
-  const [softSkillsRows]: any = await db.query('SELECT * FROM skills WHERE type="soft" LIMIT 2');
-  
-  const topSkills = [...hardSkillsRows, ...softSkillsRows];
+  let projectsRows = [];
+  let notesRows = [];
+  let topSkills = [];
+
+  try {
+    const [pRows]: any = await db.query('SELECT * FROM projects ORDER BY id DESC LIMIT 2');
+    const [nRows]: any = await db.query('SELECT * FROM notes ORDER BY id DESC LIMIT 2');
+    const [hardSkillsRows]: any = await db.query('SELECT * FROM skills WHERE type="hard" LIMIT 4');
+    const [softSkillsRows]: any = await db.query('SELECT * FROM skills WHERE type="soft" LIMIT 2');
+    
+    projectsRows = pRows;
+    notesRows = nRows;
+    topSkills = [...hardSkillsRows, ...softSkillsRows];
+  } catch (error) {
+    console.error('Database Fetch Error (Home):', error);
+    // In production, we don't want to show the full error to users, 
+    // but we need to know it happened.
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white p-4">
+        <div className="max-w-md text-center">
+          <h1 className="text-2xl font-bold text-salmon-500 mb-4">Database Connection Error</h1>
+          <p className="text-gray-400 mb-6">Sepertinya ada masalah koneksi ke database. Pastikan Environment Variables di Netlify sudah benar.</p>
+          <div className="bg-zinc-900 p-4 rounded-lg text-left text-xs font-mono overflow-auto border border-zinc-800">
+            {String(error)}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-20 pb-20">
