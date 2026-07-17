@@ -65,7 +65,7 @@ export default async function Home() {
                     { text: "A Tech Enthusiast", className: "text-salmon-500" },
                     { text: "A Fullstack Developer", className: "text-gray-300" },
                     { text: "A Data Analyst", className: "text-gray-300" },
-                    { text: "A Prompt Engineer", className: "text-gray-300" }
+                    { text: "", className: "text-gray-300" }
                   ]} 
                 />
               </div>
