@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/auth.test.cjs"
+    "test": "node --test tests/auth.test.cjs tests/activities.test.cjs"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.9",
     "@types/aos": "^3.0.7",
     "@types/bcrypt": "^6.0.0",
     "@types/nodemailer": "^7.0.11",
@@ -21,6 +22,7 @@
     "nodemailer": "^8.0.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "sharp": "^0.35.5",
     "sweetalert2": "^11.26.24"
   },
   "devDependencies": {

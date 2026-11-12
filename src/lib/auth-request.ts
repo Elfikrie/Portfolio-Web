@@ -4,7 +4,7 @@ export function authResponse(message: string, status = 200) {
   return NextResponse.json({ message }, { status, headers: { 'Cache-Control': 'private, no-store' } });
 }
 
-export function validateAuthRequest(request: Request) {
+export function validateAuthRequest(request: Request, contentType = 'application/json') {
   const origin = request.headers.get('origin');
   // Netlify can forward requests internally over HTTP. Use its trusted deployment
   // URLs as well as the request URL; never trust arbitrary forwarded-host headers.
@@ -22,7 +22,7 @@ export function validateAuthRequest(request: Request) {
   if (origin && !allowedOrigins.has(origin)) {
     return authResponse('Permintaan tidak diizinkan.', 403);
   }
-  if (!request.headers.get('content-type')?.startsWith('application/json')) {
+  if (!request.headers.get('content-type')?.startsWith(contentType)) {
     return authResponse('Format permintaan tidak valid.', 415);
   }
   return null;

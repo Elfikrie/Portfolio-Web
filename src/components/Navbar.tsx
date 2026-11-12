@@ -1,110 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import type { HeaderUser } from "@/lib/profile";
 
-const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Skills", path: "/skills" },
-  { name: "Experience", path: "/experience" },
-  { name: "Projects", path: "/projects" },
-  { name: "Notes", path: "/notes" },
+const links = [
+  { name: "Home", path: "/" }, { name: "Skills", path: "/skills" },
+  { name: "Experience", path: "/experience" }, { name: "Projects", path: "/projects" },
+  { name: "Aktivitas", path: "/activities" }, { name: "Notes", path: "/notes" },
   { name: "Contact", path: "/contact" },
 ];
 
-const Navbar = () => {
+export default function Navbar({ initialUser }: { initialUser: HeaderUser }) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(initialUser);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    let active = true;
+    async function refreshSession() {
+      try {
+        const response = await fetch("/api/auth/me", { cache: "no-store", credentials: "same-origin" });
+        if (response.ok && active) setUser((await response.json()).user);
+      } catch { /* Keep the server-verified identity during transient network errors. */ }
+    }
+    void refreshSession();
+    const focus = () => { void refreshSession(); };
+    window.addEventListener("focus", focus);
+    return () => { active = false; window.removeEventListener("focus", focus); };
+  }, [pathname]);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-  const closeMenu = () => setIsOpen(false);
-
+  const account = (
+    <Link href={user ? "/admin" : "/login"} prefetch={false} onClick={() => setOpen(false)}
+      aria-label={user ? `Dashboard ${user.name}` : "Login admin"}
+      className={user ? "site-account" : "site-account site-account-guest"}>
+      {user && <Image src={user.avatar} width={30} height={30} alt="" className="rounded-full object-cover" />}
+      <span>{user ? user.name : "Admin"}</span>
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 17 17 7M7 7h10v10" /></svg>
+    </Link>
+  );
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-salmon-500/20 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-xl font-bold tracking-tight text-white hover:text-salmon-500 transition-colors" onClick={closeMenu}>
-          Portfolio<span className="text-salmon-500">El.</span>
-        </Link>
-        
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.path || (link.path !== '/' && pathname?.startsWith(link.path));
-            return (
-              <Link 
-                key={link.path} 
-                href={link.path} 
-                className={`pb-1 transition-all duration-300 border-b-2 hover:text-salmon-400 ${
-                  isActive 
-                    ? "text-salmon-500 border-salmon-500" 
-                    : "text-gray-300 border-transparent"
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
-          
-          <Link 
-            href="/admin" prefetch={false}
-            className={`px-3 py-1 text-xs font-semibold rounded-full border transition-all ${
-              pathname?.startsWith('/admin') 
-              ? "bg-salmon-500 text-white border-salmon-500" 
-              : "bg-salmon-500/10 text-salmon-500 border-salmon-500/20 hover:bg-salmon-500 hover:text-white"
-            }`}
-          >
-            Admin
-          </Link>
+    <header className="site-header">
+      <nav aria-label="Navigasi utama" className="site-nav">
+        <Link href="/" onClick={() => setOpen(false)} className="site-logo">Portfolio<span>El.</span></Link>
+        <div className="hidden lg:flex items-center gap-6">
+          {links.map(link => <Link key={link.path} href={link.path} className="site-nav-link"
+            aria-current={pathname === link.path ? "page" : undefined}>{link.name}</Link>)}
         </div>
-
-        {/* Mobile Menu Button */}
-        <div className="flex md:hidden items-center">
-          <button onClick={toggleMenu} className="text-gray-300 hover:text-salmon-500 focus:outline-none transition-colors">
-            {isOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            )}
+        <div className="flex items-center gap-4">
+          {account}
+          <button type="button" className="site-menu-toggle lg:hidden" aria-label={open ? "Tutup menu" : "Buka menu"}
+            aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>
+            <span className={open ? "rotate-45 translate-y-[3px]" : ""} />
+            <span className={open ? "-rotate-45 -translate-y-[3px]" : ""} />
           </button>
         </div>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {isOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-zinc-900 border-b border-salmon-500/20 shadow-xl px-4 pt-4 pb-6 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.path || (link.path !== '/' && pathname?.startsWith(link.path));
-            return (
-              <Link 
-                key={link.path} 
-                href={link.path} 
-                onClick={closeMenu}
-                className={`py-2 text-base font-medium transition-colors border-l-4 pl-3 ${
-                  isActive 
-                    ? "text-salmon-500 border-salmon-500" 
-                    : "text-gray-300 border-transparent hover:text-salmon-400 hover:border-salmon-500/50"
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
-          <Link 
-            href="/admin" prefetch={false}
-            onClick={closeMenu}
-            className={`mt-2 py-2 px-4 rounded-lg text-center font-bold border transition-colors ${
-              pathname?.startsWith('/admin') 
-              ? "bg-salmon-500 text-white border-salmon-500" 
-              : "bg-salmon-500/10 text-salmon-500 border-salmon-500/20"
-            }`}
-          >
-            Admin Dashboard
-          </Link>
-        </div>
-      )}
-    </nav>
+      </nav>
+      {open && <div id="mobile-navigation" className="site-mobile-nav lg:hidden">
+        {links.map((link, index) => <Link key={link.path} href={link.path} onClick={() => setOpen(false)}
+          aria-current={pathname === link.path ? "page" : undefined}><span className="text-xs text-zinc-500 font-mono">0{index + 1}</span>{link.name}<span aria-hidden="true" className="ml-auto">↗</span></Link>)}
+      </div>}
+    </header>
   );
-};
-
-export default Navbar;
+}

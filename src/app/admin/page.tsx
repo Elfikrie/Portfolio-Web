@@ -26,6 +26,10 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="activity-dashboard-card">
+          <div><span className="journal-eyebrow">JURNAL PRIBADI</span><h2>Di luar layar.</h2><p>Simpan foto kegiatan, tulis cerita, dan bagikan momen Anda.</p></div>
+          <Link href="/admin/activities" className="editor-button-primary">Kelola Aktivitas <span aria-hidden="true">↗</span></Link>
+        </div>
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 hover:border-salmon-500/50 transition-colors">
           <h2 className="text-xl font-bold text-white mb-2">Manage Projects</h2>
           <p className="text-sm text-gray-400 mb-6">Create, edit, and delete the projects displayed on your portfolio.</p>
@@ -33,7 +37,7 @@ export default function AdminDashboard() {
             <Button className="w-full">Go to Projects</Button>
           </Link>
         </div>
-        
+
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 hover:border-salmon-500/50 transition-colors">
           <h2 className="text-xl font-bold text-white mb-2">Manage Notes</h2>
           <p className="text-sm text-gray-400 mb-6">Write new diary entries, edit existing notes, and manage insights.</p>
