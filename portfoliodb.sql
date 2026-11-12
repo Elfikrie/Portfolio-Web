@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create the initial admin user through a secure, private provisioning step.
+-- Never commit usernames, password hashes, or passwords to source control.
+
 -- Projects Table
 CREATE TABLE IF NOT EXISTS `projects` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,8 +64,13 @@ CREATE TABLE IF NOT EXISTS `organizations` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Admin Seeder
--- Username: fikrieganteng
--- Password: fikrieguanteng123
-INSERT IGNORE INTO `users` (`username`, `password_hash`) 
-VALUES ('fikrieganteng', '$2b$10$2lK.TPTOoGAWISZyPBoweuqWln1ek3hH0Cm5sBGljZXO5xFgroZV.');
+-- Comments Table (For Notes)
+CREATE TABLE IF NOT EXISTS `comments` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `note_id` INT NOT NULL,
+  `author` VARCHAR(100) NOT NULL,
+  `content` TEXT NOT NULL,
+  `date` VARCHAR(100) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`note_id`) REFERENCES `notes`(`id`) ON DELETE CASCADE
+);
