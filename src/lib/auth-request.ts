@@ -6,7 +6,20 @@ export function authResponse(message: string, status = 200) {
 
 export function validateAuthRequest(request: Request) {
   const origin = request.headers.get('origin');
-  if (origin && origin !== new URL(request.url).origin) {
+  // Netlify can forward requests internally over HTTP. Use its trusted deployment
+  // URLs as well as the request URL; never trust arbitrary forwarded-host headers.
+  const requestUrl = new URL(request.url);
+  if (process.env.NODE_ENV === 'production') requestUrl.protocol = 'https:';
+  const allowedOrigins = new Set([requestUrl.origin]);
+  for (const value of [process.env.URL, process.env.DEPLOY_URL, process.env.DEPLOY_PRIME_URL]) {
+    if (!value) continue;
+    try {
+      const url = new URL(value);
+      if (process.env.NODE_ENV === 'production') url.protocol = 'https:';
+      allowedOrigins.add(url.origin);
+    } catch { /* Ignore malformed optional deployment URLs. */ }
+  }
+  if (origin && !allowedOrigins.has(origin)) {
     return authResponse('Permintaan tidak diizinkan.', 403);
   }
   if (!request.headers.get('content-type')?.startsWith('application/json')) {

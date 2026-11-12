@@ -66,6 +66,9 @@ const passwordChange = (extra = {}) => ({ username: user.username, currentPasswo
 test.beforeEach(async () => {
   process.env.JWT_SECRET = crypto.randomBytes(48).toString('hex');
   process.env.NODE_ENV = 'production';
+  delete process.env.URL;
+  delete process.env.DEPLOY_URL;
+  delete process.env.DEPLOY_PRIME_URL;
   user = { id: 42, username: 'test-admin', password_hash: await bcrypt.hash(initialPassword, 4) };
   cookie = undefined; writes = 0; queryFailure = false; conflict = false;
 });
@@ -147,4 +150,20 @@ test('repeated attempts are throttled', async () => {
   const m = modules();
   for (let i = 0; i < 10; i++) await m.login(request({ ...credentials(), password: 'wrong' }));
   assert.equal((await m.login(request(credentials()))).status, 429);
+});
+
+test('trusted Netlify public origin survives internal HTTP proxying; foreign origins fail', async () => {
+  process.env.URL = 'http://portfolio.test';
+  const m = modules();
+  const forwarded = (origin) => new Request('http://localhost:3000/api/auth/login', {
+    method: 'POST', headers: { 'content-type': 'application/json', origin }, body: JSON.stringify(credentials()),
+  });
+  assert.equal((await m.login(forwarded('https://portfolio.test'))).status, 200);
+  assert.equal((await m.login(forwarded('https://other.test'))).status, 403);
+  delete process.env.URL;
+  const sameHost = new Request('http://portfolio.test/api/auth/login', {
+    method: 'POST', headers: { 'content-type': 'application/json', origin: 'https://portfolio.test' },
+    body: JSON.stringify(credentials()),
+  });
+  assert.equal((await m.login(sameHost)).status, 200);
 });
