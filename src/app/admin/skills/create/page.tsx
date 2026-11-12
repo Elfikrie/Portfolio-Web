@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import Link from "next/link";
 import { createSkill } from "@/app/actions/admin";
 import Swal from "sweetalert2";
+import SkillImageUpload from "@/components/SkillImageUpload";
 
 export default function CreateSkillPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function CreateSkillPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget);
 
@@ -28,6 +30,7 @@ export default function CreateSkillPage() {
           color: "#fff",
         });
         router.push("/admin/skills");
+        router.refresh();
       } else {
         await Swal.fire({
           title: "Gagal!",
@@ -63,6 +66,7 @@ export default function CreateSkillPage() {
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 sm:p-8">
         <form onSubmit={onSubmit} className="space-y-6">
+          <fieldset disabled={isSubmitting} className="space-y-6 min-w-0">
           <div className="space-y-2">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300">Skill Name</label>
             <input name="name" required type="text" id="name" className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-salmon-500/50" placeholder="e.g. Communication" />
@@ -87,6 +91,8 @@ export default function CreateSkillPage() {
             </div>
           </div>
 
+          <SkillImageUpload />
+
           <div className="pt-4 flex items-center justify-end gap-4">
             <Link href="/admin/skills">
               <Button type="button" variant="secondary">Cancel</Button>
@@ -95,6 +101,7 @@ export default function CreateSkillPage() {
               {isSubmitting ? "Saving..." : "Add Skill"}
             </Button>
           </div>
+          </fieldset>
         </form>
       </div>
     </div>

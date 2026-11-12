@@ -1,13 +1,18 @@
 import React from "react";
 import db from "@/lib/db";
+import SkillImage from "@/components/SkillImage";
+import type { RowDataPacket } from "mysql2";
 
 export const dynamic = "force-dynamic";
 
-const SkillCard = ({ skill, delay }: { skill: any; delay: number }) => (
+interface Skill extends RowDataPacket { id: number; name: string; level: number; type: 'hard' | 'soft'; image_key: string | null }
+
+const SkillCard = ({ skill, delay }: { skill: Skill; delay: number }) => (
   <div data-aos="fade-up" data-aos-delay={delay} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-salmon-500/30 transition-all duration-300">
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="text-lg font-bold text-white">{skill.name}</h3>
-      <span className="text-salmon-500 font-mono text-sm">{skill.level}%</span>
+    <div className="flex items-center gap-3 mb-5">
+      <SkillImage name={skill.name} imageKey={skill.image_key} />
+      <h3 className="min-w-0 flex-1 text-lg font-bold text-white break-words">{skill.name}</h3>
+      <span className="shrink-0 text-salmon-500 font-mono text-sm">{skill.level}%</span>
     </div>
     <div className="w-full bg-zinc-800 rounded-full h-2">
       <div
@@ -19,16 +24,16 @@ const SkillCard = ({ skill, delay }: { skill: any; delay: number }) => (
 );
 
 export default async function SkillsPage() {
-  const [rows]: any = await db.query('SELECT * FROM skills ORDER BY level DESC');
-  const hardSkills = rows.filter((s: any) => s.type === 'hard');
-  const softSkills = rows.filter((s: any) => s.type === 'soft');
+  const [rows] = await db.query<Skill[]>('SELECT * FROM skills ORDER BY level DESC');
+  const hardSkills = rows.filter(s => s.type === 'hard');
+  const softSkills = rows.filter(s => s.type === 'soft');
 
   return (
     <div className="min-h-screen pt-12 pb-24 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
       <div className="mb-16" data-aos="fade-up">
         <h1 className="text-4xl font-extrabold text-white mb-4">My <span className="text-salmon-500">Skills</span></h1>
         <p className="text-lg text-gray-400 max-w-2xl">
-          Here is an overview of the technical and interpersonal skills I've developed throughout my journey as a tech enthusiast.
+          Here is an overview of the technical and interpersonal skills I&apos;ve developed throughout my journey as a tech enthusiast.
         </p>
       </div>
 
@@ -38,7 +43,7 @@ export default async function SkillsPage() {
           Hard Skills
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {hardSkills.map((skill: any, index: number) => (
+          {hardSkills.map((skill, index) => (
             <SkillCard key={skill.id} skill={skill} delay={index * 80} />
           ))}
           {hardSkills.length === 0 && <span className="text-zinc-500">No hard skills found.</span>}
@@ -51,7 +56,7 @@ export default async function SkillsPage() {
           Soft Skills
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {softSkills.map((skill: any, index: number) => (
+          {softSkills.map((skill, index) => (
             <SkillCard key={skill.id} skill={skill} delay={index * 80} />
           ))}
           {softSkills.length === 0 && <span className="text-zinc-500">No soft skills found.</span>}

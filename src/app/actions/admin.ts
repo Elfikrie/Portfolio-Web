@@ -4,6 +4,7 @@ import db from '@/lib/db';
 import { requireAdmin } from '@/lib/admin-auth';
 import { revalidatePath } from 'next/cache';
 import { saveProjectRecord, deleteProjectRecord } from '@/lib/project-management';
+import { saveSkillRecord, deleteSkillRecord } from '@/lib/skill-management';
 
 // --- PROJECTS ---
 export async function deleteProject(id: string) {
@@ -74,48 +75,15 @@ export async function updateNote(id: string, formData: FormData) {
 // --- SKILLS ---
 export async function deleteSkill(id: string) {
   await requireAdmin();
-  try {
-    await db.query('DELETE FROM skills WHERE id = ?', [id]);
-    revalidatePath('/admin/skills');
-    revalidatePath('/skills');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Gagal menghapus skill.' };
-  }
+  return deleteSkillRecord(id);
 }
 export async function createSkill(formData: FormData) {
   await requireAdmin();
-  try {
-    const name = formData.get('name') as string;
-    const level = formData.get('level') as string;
-    const type = formData.get('type') as string;
-
-    await db.query('INSERT INTO skills (name, level, type) VALUES (?, ?, ?)',
-      [name, parseInt(level), type]
-    );
-    revalidatePath('/admin/skills');
-    revalidatePath('/skills');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Gagal membuat skill.' };
-  }
+  return saveSkillRecord(formData);
 }
 export async function updateSkill(id: string, formData: FormData) {
   await requireAdmin();
-  try {
-    const name = formData.get('name') as string;
-    const level = formData.get('level') as string;
-    const type = formData.get('type') as string;
-
-    await db.query('UPDATE skills SET name=?, level=?, type=? WHERE id=?',
-      [name, parseInt(level), type, id]
-    );
-    revalidatePath('/admin/skills');
-    revalidatePath('/skills');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Gagal mengupdate skill.' };
-  }
+  return saveSkillRecord(formData, id);
 }
 
 // --- EXPERIENCE ---

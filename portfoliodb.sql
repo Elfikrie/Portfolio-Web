@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `skills` (
   `name` VARCHAR(100) NOT NULL,
   `level` INT NOT NULL DEFAULT 50,
   `type` ENUM('hard', 'soft') NOT NULL,
+  `image_key` VARCHAR(80) NULL DEFAULT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

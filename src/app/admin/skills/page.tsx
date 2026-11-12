@@ -4,11 +4,13 @@ import db from "@/lib/db";
 import { Button } from "@/components/Button";
 import { DeleteButton } from "@/components/DeleteButton";
 import { deleteSkill } from "@/app/actions/admin";
+import SkillImage from "@/components/SkillImage";
+import type { RowDataPacket } from "mysql2";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSkillsPage() {
-  const [rows]: any = await db.query('SELECT * FROM skills ORDER BY type ASC, level DESC');
+  const [rows] = await db.query<RowDataPacket[]>('SELECT * FROM skills ORDER BY type ASC, level DESC');
 
   return (
     <div className="min-h-screen pt-12 pb-24 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 w-full">
@@ -41,12 +43,12 @@ export default async function AdminSkillsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
-              {rows.map((skill: any) => {
+              {rows.map(skill => {
                 const boundDelete = deleteSkill.bind(null, skill.id.toString());
                 return (
                   <tr key={skill.id} className="hover:bg-zinc-800/20 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-white">{skill.name}</div>
+                      <div className="flex items-center gap-3 font-semibold text-white"><SkillImage name={skill.name} imageKey={skill.image_key} size="small" /><span>{skill.name}</span></div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">

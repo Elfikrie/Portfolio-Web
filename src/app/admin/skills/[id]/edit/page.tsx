@@ -5,11 +5,13 @@ import { EditFormWrapper } from "@/components/EditFormWrapper";
 import Link from "next/link";
 import { updateSkill } from "@/app/actions/admin";
 import { redirect } from "next/navigation";
+import SkillImageUpload from "@/components/SkillImageUpload";
+import type { RowDataPacket } from "mysql2";
 
 export default async function EditSkillPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [rows]: any = await db.query('SELECT * FROM skills WHERE id = ?', [id]);
-  
+  const [rows] = await db.query<RowDataPacket[]>('SELECT * FROM skills WHERE id = ?', [id]);
+
   if (rows.length === 0) {
     redirect('/admin/skills');
   }
@@ -51,6 +53,8 @@ export default async function EditSkillPage({ params }: { params: Promise<{ id: 
                </label>
             </div>
           </div>
+
+          <SkillImageUpload imageKey={skill.image_key} />
 
           <div className="pt-4 flex items-center justify-end gap-4">
             <Link href="/admin/skills">
