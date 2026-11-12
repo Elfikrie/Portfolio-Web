@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/auth.test.cjs tests/activities.test.cjs"
+    "test": "node --test tests/auth.test.cjs tests/activities.test.cjs tests/project-covers.test.cjs"
   },
   "dependencies": {
     "@netlify/blobs": "^11.1.9",

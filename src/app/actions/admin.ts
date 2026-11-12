@@ -3,58 +3,20 @@
 import db from '@/lib/db';
 import { requireAdmin } from '@/lib/admin-auth';
 import { revalidatePath } from 'next/cache';
+import { saveProjectRecord, deleteProjectRecord } from '@/lib/project-management';
 
 // --- PROJECTS ---
 export async function deleteProject(id: string) {
   await requireAdmin();
-  try {
-    await db.query('DELETE FROM projects WHERE id = ?', [id]);
-    revalidatePath('/admin/projects');
-    revalidatePath('/projects');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Gagal menghapus project.' };
-  }
+  return deleteProjectRecord(id);
 }
 export async function createProject(formData: FormData) {
   await requireAdmin();
-  try {
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const demoUrl = formData.get('demoUrl') as string;
-    const imageUrl = formData.get('imageUrl') as string;
-    const tagsText = formData.get('tags') as string;
-    const tags = tagsText ? tagsText.split(',').map(t => t.trim()) : [];
-    
-    await db.query('INSERT INTO projects (title, description, demoUrl, imageUrl, tags) VALUES (?, ?, ?, ?, ?)', 
-      [title, description, demoUrl, imageUrl, JSON.stringify(tags)]
-    );
-    revalidatePath('/admin/projects');
-    revalidatePath('/projects');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Gagal membuat project.' };
-  }
+  return saveProjectRecord(formData);
 }
 export async function updateProject(id: string, formData: FormData) {
   await requireAdmin();
-  try {
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const demoUrl = formData.get('demoUrl') as string;
-    const imageUrl = formData.get('imageUrl') as string;
-    const tagsText = formData.get('tags') as string;
-    const tags = tagsText ? tagsText.split(',').map(t => t.trim()) : [];
-    
-    await db.query('UPDATE projects SET title=?, description=?, demoUrl=?, imageUrl=?, tags=? WHERE id=?', 
-      [title, description, demoUrl, imageUrl, JSON.stringify(tags), id]
-    );
-    revalidatePath('/admin/projects');
-    revalidatePath('/projects');
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Gagal mengupdate project.' };
-  }
+  return saveProjectRecord(formData, id);
 }
 
 // --- NOTES ---
@@ -76,11 +38,11 @@ export async function createNote(formData: FormData) {
     const content = formData.get('content') as string;
     const tagsText = formData.get('tags') as string;
     const tags = tagsText ? tagsText.split(',').map(t => t.trim()) : [];
-    
+
     const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
     const date = new Date().toLocaleDateString('en-US', dateOptions);
 
-    await db.query('INSERT INTO notes (title, content, tags, date) VALUES (?, ?, ?, ?)', 
+    await db.query('INSERT INTO notes (title, content, tags, date) VALUES (?, ?, ?, ?)',
       [title, content, JSON.stringify(tags), date]
     );
     revalidatePath('/admin/notes');
@@ -97,8 +59,8 @@ export async function updateNote(id: string, formData: FormData) {
     const content = formData.get('content') as string;
     const tagsText = formData.get('tags') as string;
     const tags = tagsText ? tagsText.split(',').map(t => t.trim()) : [];
-    
-    await db.query('UPDATE notes SET title=?, content=?, tags=? WHERE id=?', 
+
+    await db.query('UPDATE notes SET title=?, content=?, tags=? WHERE id=?',
       [title, content, JSON.stringify(tags), id]
     );
     revalidatePath('/admin/notes');
@@ -127,8 +89,8 @@ export async function createSkill(formData: FormData) {
     const name = formData.get('name') as string;
     const level = formData.get('level') as string;
     const type = formData.get('type') as string;
-    
-    await db.query('INSERT INTO skills (name, level, type) VALUES (?, ?, ?)', 
+
+    await db.query('INSERT INTO skills (name, level, type) VALUES (?, ?, ?)',
       [name, parseInt(level), type]
     );
     revalidatePath('/admin/skills');
@@ -144,8 +106,8 @@ export async function updateSkill(id: string, formData: FormData) {
     const name = formData.get('name') as string;
     const level = formData.get('level') as string;
     const type = formData.get('type') as string;
-    
-    await db.query('UPDATE skills SET name=?, level=?, type=? WHERE id=?', 
+
+    await db.query('UPDATE skills SET name=?, level=?, type=? WHERE id=?',
       [name, parseInt(level), type, id]
     );
     revalidatePath('/admin/skills');
@@ -175,8 +137,8 @@ export async function createExperience(formData: FormData) {
     const company = formData.get('company') as string;
     const duration = formData.get('duration') as string;
     const description = formData.get('description') as string;
-    
-    await db.query('INSERT INTO experiences (role, company, duration, description) VALUES (?, ?, ?, ?)', 
+
+    await db.query('INSERT INTO experiences (role, company, duration, description) VALUES (?, ?, ?, ?)',
       [role, company, duration, description]
     );
     revalidatePath('/admin/experience');
@@ -193,8 +155,8 @@ export async function updateExperience(id: string, formData: FormData) {
     const company = formData.get('company') as string;
     const duration = formData.get('duration') as string;
     const description = formData.get('description') as string;
-    
-    await db.query('UPDATE experiences SET role=?, company=?, duration=?, description=? WHERE id=?', 
+
+    await db.query('UPDATE experiences SET role=?, company=?, duration=?, description=? WHERE id=?',
       [role, company, duration, description, id]
     );
     revalidatePath('/admin/experience');
@@ -224,8 +186,8 @@ export async function createOrganization(formData: FormData) {
     const name = formData.get('name') as string;
     const duration = formData.get('duration') as string;
     const description = formData.get('description') as string;
-    
-    await db.query('INSERT INTO organizations (role, name, duration, description) VALUES (?, ?, ?, ?)', 
+
+    await db.query('INSERT INTO organizations (role, name, duration, description) VALUES (?, ?, ?, ?)',
       [role, name, duration, description]
     );
     revalidatePath('/admin/organization');
@@ -242,8 +204,8 @@ export async function updateOrganization(id: string, formData: FormData) {
     const name = formData.get('name') as string;
     const duration = formData.get('duration') as string;
     const description = formData.get('description') as string;
-    
-    await db.query('UPDATE organizations SET role=?, name=?, duration=?, description=? WHERE id=?', 
+
+    await db.query('UPDATE organizations SET role=?, name=?, duration=?, description=? WHERE id=?',
       [role, name, duration, description, id]
     );
     revalidatePath('/admin/organization');

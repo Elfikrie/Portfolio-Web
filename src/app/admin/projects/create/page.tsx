@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import Link from "next/link";
 import { createProject } from "@/app/actions/admin";
 import Swal from "sweetalert2";
+import ProjectCoverUpload from "@/components/ProjectCoverUpload";
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function CreateProjectPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget);
 
@@ -28,6 +30,7 @@ export default function CreateProjectPage() {
           color: "#fff",
         });
         router.push("/admin/projects");
+        router.refresh();
       } else {
         await Swal.fire({
           title: "Gagal!",
@@ -63,6 +66,7 @@ export default function CreateProjectPage() {
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 sm:p-8">
         <form onSubmit={onSubmit} className="space-y-6">
+          <fieldset disabled={isSubmitting} className="space-y-6 min-w-0">
           <div className="space-y-2">
             <label htmlFor="title" className="block text-sm font-medium text-gray-300">Project Title</label>
             <input name="title" required type="text" id="title" className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-salmon-500/50" placeholder="e.g. My Awesome App" />
@@ -78,10 +82,7 @@ export default function CreateProjectPage() {
             <input name="demoUrl" type="url" id="demoUrl" className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-salmon-500/50" placeholder="https://my-app.vercel.app" />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-300">Image Cover URL</label>
-            <input name="imageUrl" type="url" id="imageUrl" className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-salmon-500/50" placeholder="https://..." />
-          </div>
+          <ProjectCoverUpload />
 
           <div className="space-y-2">
             <label htmlFor="tags" className="block text-sm font-medium text-gray-300">Tags (comma separated)</label>
@@ -96,6 +97,7 @@ export default function CreateProjectPage() {
               {isSubmitting ? "Creating..." : "Create Project"}
             </Button>
           </div>
+          </fieldset>
         </form>
       </div>
     </div>

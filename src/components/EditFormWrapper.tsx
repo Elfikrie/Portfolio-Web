@@ -18,6 +18,7 @@ export function EditFormWrapper({ action, redirectTo, children, className, succe
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isPending) return;
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
@@ -33,6 +34,7 @@ export function EditFormWrapper({ action, redirectTo, children, className, succe
             color: "#fff",
           });
           router.push(redirectTo);
+          router.refresh();
         } else {
           await Swal.fire({
             title: "Gagal!",
@@ -57,8 +59,8 @@ export function EditFormWrapper({ action, redirectTo, children, className, succe
   };
 
   return (
-    <form onSubmit={handleSubmit} className={className}>
-      {children}
+    <form onSubmit={handleSubmit} className={className} aria-busy={isPending}>
+      <fieldset disabled={isPending} className="contents">{children}</fieldset>
     </form>
   );
 }

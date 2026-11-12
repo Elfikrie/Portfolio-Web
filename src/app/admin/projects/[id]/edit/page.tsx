@@ -5,11 +5,13 @@ import { EditFormWrapper } from "@/components/EditFormWrapper";
 import Link from "next/link";
 import { updateProject } from "@/app/actions/admin";
 import { redirect } from "next/navigation";
+import ProjectCoverUpload from "@/components/ProjectCoverUpload";
+import type { RowDataPacket } from "mysql2";
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [rows]: any = await db.query('SELECT * FROM projects WHERE id = ?', [id]);
-  
+  const [rows] = await db.query<RowDataPacket[]>('SELECT * FROM projects WHERE id = ?', [id]);
+
   if (rows.length === 0) {
     redirect('/admin/projects');
   }
@@ -44,10 +46,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
             <input name="demoUrl" defaultValue={project.demoUrl || project.demourl} type="url" id="demoUrl" className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-salmon-500/50" />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-300">Image Cover URL</label>
-            <input name="imageUrl" defaultValue={project.imageUrl || project.imageurl} type="url" id="imageUrl" className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-salmon-500/50" />
-          </div>
+          <ProjectCoverUpload currentUrl={project.imageUrl || project.imageurl} />
 
           <div className="space-y-2">
             <label htmlFor="tags" className="block text-sm font-medium text-gray-300">Tags (comma separated)</label>
