@@ -24,9 +24,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Generate JWT via jose
-    const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || 'super_secret_jwt_key_fikrie_2026_portfolio');
-    
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('JWT_SECRET is not configured');
+      return NextResponse.json({ message: 'Server configuration error' }, { status: 500 });
+    }
+
+    const secretKey = new TextEncoder().encode(jwtSecret);
     const token = await new SignJWT({ userId: user.id, username: user.username })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
       .sign(secretKey);
 
     const response = NextResponse.json({ message: 'Login successful' }, { status: 200 });
-    
+
     response.cookies.set('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
