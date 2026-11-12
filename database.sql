@@ -10,10 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Note: The password hash below is for 'fikrieguanteng123' generated with bcrypt (cost=10)
-INSERT INTO users (username, password_hash) 
-VALUES ('fikrieganteng', '$2b$10$2lK.TPTOoGAWISZyPBoweuqWln1ek3hH0Cm5sBGljZXO5xFgroZV.')
-ON DUPLICATE KEY UPDATE username=username;
+-- Create the initial admin user through a secure, private provisioning step.
+-- Never commit usernames, password hashes, or passwords to source control.
 
 -- 2. Projects Table
 CREATE TABLE IF NOT EXISTS projects (
