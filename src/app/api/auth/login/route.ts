@@ -1,59 +1,35 @@
-import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import db from '@/lib/db';
-import { SignJWT } from 'jose';
+import { type AdminUser, passwordVersion } from '@/lib/admin-auth';
+import { createSession, sessionKey, SESSION_COOKIE, SESSION_SECONDS, sessionCookieOptions } from '@/lib/session';
+import { authResponse, validateAuthRequest, validCredentials, tooManyAttempts } from '@/lib/auth-request';
 
 export async function POST(request: Request) {
+  const invalid = validateAuthRequest(request);
+  if (invalid) return invalid;
+  const body = await request.json().catch(() => null);
+  if (!body || !validCredentials(body.username, body.password)) {
+    return authResponse('Isi username dan password dengan benar.', 400);
+  }
+  const { username, password } = body as { username: string; password: string };
+  if (tooManyAttempts(username)) return authResponse('Terlalu banyak percobaan. Tunggu satu menit.', 429);
+  try { sessionKey(); } catch {
+    return authResponse('Konfigurasi login belum siap. Hubungi pengelola website.', 503);
+  }
   try {
-    const { username, password } = await request.json();
-
-    if (!username || !password) {
-      return NextResponse.json({ message: 'Username and password are required' }, { status: 400 });
+    const [users] = await db.query<AdminUser[]>(
+      'SELECT id, username, password_hash FROM users WHERE username = ? LIMIT 1', [username.trim()],
+    );
+    const user = users[0];
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      return authResponse('Username atau password salah.', 401);
     }
-
-    const [rows]: any = await db.query('SELECT * FROM users WHERE username = ?', [username]);
-
-    if (rows.length === 0) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
-    }
-
-    const user = rows[0];
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
-    if (!passwordMatch) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
-    }
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      console.error('JWT_SECRET is not configured');
-      return NextResponse.json({ message: 'Server configuration error' }, { status: 500 });
-    }
-
-    const secretKey = new TextEncoder().encode(jwtSecret);
-    const token = await new SignJWT({ userId: user.id, username: user.username })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('24h')
-      .sign(secretKey);
-
-    const response = NextResponse.json({ message: 'Login successful' }, { status: 200 });
-
-    response.cookies.set('admin_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 // 24 hours
-    });
-
+    const token = await createSession(user.id, passwordVersion(user.password_hash));
+    const response = authResponse('Login berhasil.');
+    response.cookies.set(SESSION_COOKIE, token, { ...sessionCookieOptions, maxAge: SESSION_SECONDS });
     return response;
-
-  } catch (error) {
-    console.error('Login error:', error);
-    // On the first run without DB initialized, intercept and return explicit error message
-    if ((error as any).code === 'ER_BAD_DB_ERROR' || (error as any).code === 'ECONNREFUSED' || (error as any).code === 'ER_NO_SUCH_TABLE') {
-       return NextResponse.json({ message: 'Database connecting error. Did you import database.sql?' }, { status: 500 });
-    }
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+  } catch {
+    console.error('Admin login unavailable');
+    return authResponse('Layanan login sedang tidak tersedia. Silakan coba lagi.', 503);
   }
 }

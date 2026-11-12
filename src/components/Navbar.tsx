@@ -47,7 +47,7 @@ const Navbar = () => {
           })}
           
           <Link 
-            href="/admin" 
+            href="/admin" prefetch={false}
             className={`px-3 py-1 text-xs font-semibold rounded-full border transition-all ${
               pathname?.startsWith('/admin') 
               ? "bg-salmon-500 text-white border-salmon-500" 
@@ -91,7 +91,7 @@ const Navbar = () => {
             );
           })}
           <Link 
-            href="/admin" 
+            href="/admin" prefetch={false}
             onClick={closeMenu}
             className={`mt-2 py-2 px-4 rounded-lg text-center font-bold border transition-colors ${
               pathname?.startsWith('/admin') 

@@ -1,10 +1,12 @@
 "use server";
 
 import db from '@/lib/db';
+import { requireAdmin } from '@/lib/admin-auth';
 import { revalidatePath } from 'next/cache';
 
 // --- PROJECTS ---
 export async function deleteProject(id: string) {
+  await requireAdmin();
   try {
     await db.query('DELETE FROM projects WHERE id = ?', [id]);
     revalidatePath('/admin/projects');
@@ -15,6 +17,7 @@ export async function deleteProject(id: string) {
   }
 }
 export async function createProject(formData: FormData) {
+  await requireAdmin();
   try {
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
@@ -34,6 +37,7 @@ export async function createProject(formData: FormData) {
   }
 }
 export async function updateProject(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
@@ -55,6 +59,7 @@ export async function updateProject(id: string, formData: FormData) {
 
 // --- NOTES ---
 export async function deleteNote(id: string) {
+  await requireAdmin();
   try {
     await db.query('DELETE FROM notes WHERE id = ?', [id]);
     revalidatePath('/admin/notes');
@@ -65,6 +70,7 @@ export async function deleteNote(id: string) {
   }
 }
 export async function createNote(formData: FormData) {
+  await requireAdmin();
   try {
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
@@ -85,6 +91,7 @@ export async function createNote(formData: FormData) {
   }
 }
 export async function updateNote(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
@@ -104,6 +111,7 @@ export async function updateNote(id: string, formData: FormData) {
 
 // --- SKILLS ---
 export async function deleteSkill(id: string) {
+  await requireAdmin();
   try {
     await db.query('DELETE FROM skills WHERE id = ?', [id]);
     revalidatePath('/admin/skills');
@@ -114,6 +122,7 @@ export async function deleteSkill(id: string) {
   }
 }
 export async function createSkill(formData: FormData) {
+  await requireAdmin();
   try {
     const name = formData.get('name') as string;
     const level = formData.get('level') as string;
@@ -130,6 +139,7 @@ export async function createSkill(formData: FormData) {
   }
 }
 export async function updateSkill(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const name = formData.get('name') as string;
     const level = formData.get('level') as string;
@@ -148,6 +158,7 @@ export async function updateSkill(id: string, formData: FormData) {
 
 // --- EXPERIENCE ---
 export async function deleteExperience(id: string) {
+  await requireAdmin();
   try {
     await db.query('DELETE FROM experiences WHERE id = ?', [id]);
     revalidatePath('/admin/experience');
@@ -158,6 +169,7 @@ export async function deleteExperience(id: string) {
   }
 }
 export async function createExperience(formData: FormData) {
+  await requireAdmin();
   try {
     const role = formData.get('role') as string;
     const company = formData.get('company') as string;
@@ -175,6 +187,7 @@ export async function createExperience(formData: FormData) {
   }
 }
 export async function updateExperience(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const role = formData.get('role') as string;
     const company = formData.get('company') as string;
@@ -194,6 +207,7 @@ export async function updateExperience(id: string, formData: FormData) {
 
 // --- ORGANIZATION ---
 export async function deleteOrganization(id: string) {
+  await requireAdmin();
   try {
     await db.query('DELETE FROM organizations WHERE id = ?', [id]);
     revalidatePath('/admin/organization');
@@ -204,6 +218,7 @@ export async function deleteOrganization(id: string) {
   }
 }
 export async function createOrganization(formData: FormData) {
+  await requireAdmin();
   try {
     const role = formData.get('role') as string;
     const name = formData.get('name') as string;
@@ -221,6 +236,7 @@ export async function createOrganization(formData: FormData) {
   }
 }
 export async function updateOrganization(id: string, formData: FormData) {
+  await requireAdmin();
   try {
     const role = formData.get('role') as string;
     const name = formData.get('name') as string;
